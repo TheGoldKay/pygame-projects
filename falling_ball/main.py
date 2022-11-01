@@ -1,5 +1,6 @@
 from tkinter import LEFT
 from matplotlib.backend_bases import DrawEvent
+from matplotlib.pyplot import barh
 from matplotlib.sankey import RIGHT
 import pygame as pg 
 import sys
@@ -18,14 +19,26 @@ CIRCLE_CY = (WIN_HEIGHT / 2) + (WIN_HEIGHT / 4)
 CIRCLE_COLOR = (200, 200, 200)
 CIRCLE_SPEED = 5
 
+BAR_HEIGHT = 30
+
 def makeCircle(r, cx, cy):
   circle = pg.Rect(0, 0, r * 2, r * 2)
   circle.center = cx, cy 
   return circle 
 
-def drawDisplay(win, circle):
+def makeBar(bars):
+  rect = pg.Rect(0, WIN_HEIGHT - BAR_HEIGHT, WIN_WIDTH, BAR_HEIGHT)
+  bars.append(rect)
+  return bars 
+
+def drawBars(win, bars):
+  for bar in bars:
+    pg.draw.rect(win, 'black', bar, 4)
+
+def drawDisplay(win, circle, bars):
   win.fill(BG_COLOR)
-  pg.draw.circle(win, "white", circle.center, CIRCLE_RADIUS)
+  pg.draw.circle(win, 'white', circle.center, CIRCLE_RADIUS)
+  drawBars(win, bars)
   pg.display.update()
 
 def moveCircle(circle, left, right):
@@ -49,6 +62,8 @@ def main():
   RIGHT = False 
   LEFT = False 
   run = True 
+  bars = []
+  bars = makeBar(bars)
   while run:
     clock.tick(FPS)
     for event in pg.event.get():
@@ -65,7 +80,7 @@ def main():
         LEFT = False 
         RIGHT = False 
     circle = moveCircle(circle, LEFT, RIGHT)
-    drawDisplay(screen, circle)
+    drawDisplay(screen, circle, bars)
   pg.quit()
   sys.exit()
     
