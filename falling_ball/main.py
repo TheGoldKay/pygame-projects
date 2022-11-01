@@ -13,22 +13,26 @@ WIN_WIDTH = 400
 WIN_HEIGHT = 800
 BG_COLOR = (0, 160, 80)
 
-CIRCLE_RADIUS = 25
+CIRCLE_RADIUS = 20
 CIRCLE_CX = WIN_WIDTH / 2
 CIRCLE_CY = (WIN_HEIGHT / 2) + (WIN_HEIGHT / 4)
 CIRCLE_COLOR = (200, 200, 200)
 CIRCLE_SPEED = 5
 
 BAR_HEIGHT = 30
+BAR_SPEED = 2
 
 def makeCircle(r, cx, cy):
   circle = pg.Rect(0, 0, r * 2, r * 2)
   circle.center = cx, cy 
   return circle 
 
-def makeBar(bars):
-  rect = pg.Rect(0, WIN_HEIGHT - BAR_HEIGHT, WIN_WIDTH, BAR_HEIGHT)
-  bars.append(rect)
+def makeBars():
+  bars = []
+  for y in range(BAR_HEIGHT, WIN_HEIGHT - BAR_HEIGHT, BAR_HEIGHT * 4):
+    rect = pg.Rect(0, y, WIN_WIDTH, BAR_HEIGHT)
+    bars.append(rect)
+  bars[-1].y -= 20
   return bars 
 
 def drawBars(win, bars):
@@ -53,6 +57,14 @@ def moveCircle(circle, left, right):
   elif circle.x + CIRCLE_RADIUS * 2 >= WIN_WIDTH:
     circle.x = WIN_WIDTH - CIRCLE_RADIUS * 2
   return circle 
+
+def moveBars(bars):
+  for i, bar in enumerate(bars):
+    bar.y -= BAR_SPEED
+    if bar.y < 0: 
+      bar.y = WIN_HEIGHT
+    bars[i] = bar 
+  return bars 
   
 def main():
   clock = pg.time.Clock()
@@ -62,8 +74,7 @@ def main():
   RIGHT = False 
   LEFT = False 
   run = True 
-  bars = []
-  bars = makeBar(bars)
+  bars = makeBars()
   while run:
     clock.tick(FPS)
     for event in pg.event.get():
@@ -80,6 +91,7 @@ def main():
         LEFT = False 
         RIGHT = False 
     circle = moveCircle(circle, LEFT, RIGHT)
+    bars = moveBars(bars)
     drawDisplay(screen, circle, bars)
   pg.quit()
   sys.exit()
