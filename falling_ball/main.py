@@ -15,6 +15,7 @@ CIRCLE_CX = WIN_WIDTH / 2
 CIRCLE_CY = (WIN_HEIGHT / 2) + (WIN_HEIGHT / 4)
 CIRCLE_COLOR = (200, 200, 200)
 CIRCLE_SPEED = 5
+FALL = False 
 
 BAR_HEIGHT = 30
 BAR_SPEED = 2
@@ -51,7 +52,8 @@ def drawDisplay(win, circle, bars):
   pg.draw.circle(win, 'green', circle.center, CIRCLE_RADIUS)
   pg.display.update()
 
-def moveCircle(circle, left, right):
+def moveCircle(circle, left, right, bars):
+  global FALL
   if left:
     circle.x -=  CIRCLE_SPEED 
     LEFT = True 
@@ -62,6 +64,24 @@ def moveCircle(circle, left, right):
     circle.x = 0
   elif circle.x + CIRCLE_RADIUS * 2 >= WIN_WIDTH:
     circle.x = WIN_WIDTH - CIRCLE_RADIUS * 2
+  
+  
+  for pair in bars:
+    bar, hole = pair 
+    hole.y -= 3
+    if circle.colliderect(hole):
+      FALL = True 
+    if circle.colliderect(bar) and not circle.colliderect(hole):
+      circle.y = bar.y - CIRCLE_RADIUS * 2 
+      FALL = False 
+  
+  if FALL:
+    circle.y += CIRCLE_SPEED
+    
+  if circle.y <= 0:
+    circle.y = WIN_HEIGHT 
+  elif circle.y + CIRCLE_RADIUS * 2 >= WIN_HEIGHT:
+    circle.y = WIN_HEIGHT - CIRCLE_RADIUS * 2
   return circle 
 
 def moveBars(bars):
@@ -82,6 +102,7 @@ def main():
   pg.display.set_caption("Falling Ball")
   RIGHT = False 
   LEFT = False 
+  FALL = False 
   run = True 
   bars = makeBars()
   while run:
@@ -99,7 +120,7 @@ def main():
       elif event.type == pg.KEYUP:
         LEFT = False 
         RIGHT = False 
-    circle = moveCircle(circle, LEFT, RIGHT)
+    circle = moveCircle(circle, LEFT, RIGHT, bars)
     bars = moveBars(bars)
     drawDisplay(screen, circle, bars)
   pg.quit()
