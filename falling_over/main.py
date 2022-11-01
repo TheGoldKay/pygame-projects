@@ -1,7 +1,12 @@
+from tkinter import LEFT
+from matplotlib.backend_bases import DrawEvent
+from matplotlib.sankey import RIGHT
 import pygame as pg 
 import sys
 
 pg.init()
+
+FPS = 60
 
 WIN_WIDTH = 400
 WIN_HEIGHT = 800
@@ -11,30 +16,58 @@ CIRCLE_RADIUS = 25
 CIRCLE_CX = WIN_WIDTH / 2
 CIRCLE_CY = (WIN_HEIGHT / 2) + (WIN_HEIGHT / 4)
 CIRCLE_COLOR = (200, 200, 200)
+CIRCLE_SPEED = 5
 
 def makeCircle(r, cx, cy):
-  circle = pg.rect.Rect(0, 0, r * 2, r * 2)
+  circle = pg.Rect(0, 0, r * 2, r * 2)
   circle.center = cx, cy 
   return circle 
 
+def drawDisplay(win, circle):
+  win.fill(BG_COLOR)
+  pg.draw.circle(win, "white", circle.center, CIRCLE_RADIUS)
+  pg.display.update()
 
-
+def moveCircle(circle, left, right):
+  if left:
+    circle.x -=  CIRCLE_SPEED 
+    LEFT = True 
+  elif right:
+    circle.x += CIRCLE_SPEED 
+    RIGHT = True 
+  if circle.x <= 0:
+    circle.x = 0
+  elif circle.x + CIRCLE_RADIUS * 2 >= WIN_WIDTH:
+    circle.x = WIN_WIDTH - CIRCLE_RADIUS * 2
+  return circle 
+  
 def main():
+  clock = pg.time.Clock()
   circle = makeCircle(CIRCLE_RADIUS, CIRCLE_CX, CIRCLE_CY)
   pg.display.init()
   screen = pg.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
-  while True:
-    screen.fill(BG_COLOR)
+  RIGHT = False 
+  LEFT = False 
+  run = True 
+  while run:
+    clock.tick(FPS)
     for event in pg.event.get():
       if event.type == pg.QUIT:
-        pg.quit()
-        sys.exit()
+        run = False 
       elif event.type == pg.KEYDOWN:
         if event.key == pg.K_ESCAPE:
-          pg.quit()
-          sys.exit()
-    pg.draw.circle(screen, CIRCLE_COLOR, circle.center, CIRCLE_RADIUS)
-    pg.display.flip()
+          run = False 
+        elif event.key in (pg.K_a, pg.K_LEFT):
+          LEFT = True  
+        elif event.key in (pg.K_d, pg.K_RIGHT):
+          RIGHT = True 
+      elif event.type == pg.KEYUP:
+        LEFT = False 
+        RIGHT = False 
+    circle = moveCircle(circle, LEFT, RIGHT)
+    drawDisplay(screen, circle)
+  pg.quit()
+  sys.exit()
     
   
 
