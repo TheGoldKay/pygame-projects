@@ -1,9 +1,6 @@
-from tkinter import LEFT
-from matplotlib.backend_bases import DrawEvent
-from matplotlib.pyplot import barh
-from matplotlib.sankey import RIGHT
 import pygame as pg 
 import sys
+from random import randint
 
 pg.init()
 
@@ -22,27 +19,36 @@ CIRCLE_SPEED = 5
 BAR_HEIGHT = 30
 BAR_SPEED = 2
 
+HOLE_WIDTH = 80
+
 def makeCircle(r, cx, cy):
   circle = pg.Rect(0, 0, r * 2, r * 2)
   circle.center = cx, cy 
   return circle 
 
+def makeHole(bar):
+  left = randint(0, WIN_WIDTH - HOLE_WIDTH)
+  hole = pg.Rect(left, bar.y, HOLE_WIDTH, BAR_HEIGHT)
+  return hole 
+
 def makeBars():
   bars = []
   for y in range(BAR_HEIGHT, WIN_HEIGHT - BAR_HEIGHT, BAR_HEIGHT * 4):
     rect = pg.Rect(0, y, WIN_WIDTH, BAR_HEIGHT)
-    bars.append(rect)
-  bars[-1].y -= 20
+    hole = makeHole(rect)
+    bars.append([rect, hole])
+  bars[-1][0].y -= 20
   return bars 
 
 def drawBars(win, bars):
-  for bar in bars:
-    pg.draw.rect(win, 'black', bar, 4)
+  for pair in bars:
+    pg.draw.rect(win, (180, 180, 180), pair[0])
+    pg.draw.rect(win, BG_COLOR, pair[1])
 
 def drawDisplay(win, circle, bars):
   win.fill(BG_COLOR)
-  pg.draw.circle(win, 'white', circle.center, CIRCLE_RADIUS)
   drawBars(win, bars)
+  pg.draw.circle(win, 'green', circle.center, CIRCLE_RADIUS)
   pg.display.update()
 
 def moveCircle(circle, left, right):
@@ -59,11 +65,13 @@ def moveCircle(circle, left, right):
   return circle 
 
 def moveBars(bars):
-  for i, bar in enumerate(bars):
+  for i, pair in enumerate(bars):
+    bar, hole = pair 
     bar.y -= BAR_SPEED
     if bar.y < 0: 
       bar.y = WIN_HEIGHT
-    bars[i] = bar 
+    hole.y = bar.y 
+    bars[i] = [bar, hole]
   return bars 
   
 def main():
@@ -71,6 +79,7 @@ def main():
   circle = makeCircle(CIRCLE_RADIUS, CIRCLE_CX, CIRCLE_CY)
   pg.display.init()
   screen = pg.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
+  pg.display.set_caption("Falling Ball")
   RIGHT = False 
   LEFT = False 
   run = True 
