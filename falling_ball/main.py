@@ -15,16 +15,11 @@ CIRCLE_CX = WIN_WIDTH / 2
 CIRCLE_CY = (WIN_HEIGHT / 2) + (WIN_HEIGHT / 4)
 CIRCLE_COLOR = (200, 200, 200)
 CIRCLE_SPEED = 5
-FALL = False 
-OFF = 5
 
 BAR_HEIGHT = 30
 BAR_SPEED = 2
 
-OFF = 20
-HOLE_WIDTH = 60 + OFF * 2
-
-BAR_ON = None 
+HOLE_WIDTH = 80
 
 def makeCircle(r, cx, cy):
   circle = pg.Rect(0, 0, r * 2, r * 2)
@@ -56,8 +51,7 @@ def drawDisplay(win, circle, bars):
   pg.draw.circle(win, 'green', circle.center, CIRCLE_RADIUS)
   pg.display.update()
 
-def moveCircle(circle, left, right, bars):
-  global FALL
+def moveCircle(circle, left, right, bars, fall):
   if left:
     circle.x -=  CIRCLE_SPEED 
     LEFT = True 
@@ -69,29 +63,22 @@ def moveCircle(circle, left, right, bars):
   elif circle.x + CIRCLE_RADIUS * 2 >= WIN_WIDTH:
     circle.x = WIN_WIDTH - CIRCLE_RADIUS * 2
   
-  
-  for pair in bars:
-    bar, hole = pair 
-    #left_rect = pg.Rect(hole.left, hole.top, OFF, BAR_HEIGHT)
-    #right_rect = pg.Rect(hole.right - OFF, hole.top, OFF, BAR_HEIGHT)
-    rect = pg.Rect(hole.left - OFF, hole.top - OFF, HOLE_WIDTH + OFF * 2, BAR_HEIGHT)
+  for bar, hole in bars:
+    rect = pg.Rect(hole.left, hole.top, HOLE_WIDTH, BAR_HEIGHT)
     if circle.colliderect(rect):
-      FALL = True 
-    #else:
-    if circle.colliderect(bar):
-          #if (circle.colliderect(hole) or circle.colliderect(left_rect) or circle.colliderect(right_rect)):
-          #if not (bar.top < circle.bottom < bar.bottom or bar.right < circle.bottom < bar.bottom):
+      fall = True 
+    if circle.colliderect(bar) and not circle.colliderect(rect):
           circle.y = bar.y - CIRCLE_RADIUS * 2
-          FALL = False 
+          fall = False 
   
-  if FALL:
+  if fall:
     circle.y += CIRCLE_SPEED
     
   if circle.y <= 0:
     circle.y = WIN_HEIGHT 
   elif circle.y + CIRCLE_RADIUS * 2 >= WIN_HEIGHT:
     circle.y = WIN_HEIGHT - CIRCLE_RADIUS * 2
-  return circle 
+  return circle, fall 
 
 def moveBars(bars):
   for i, pair in enumerate(bars):
@@ -111,8 +98,7 @@ def main():
   pg.display.set_caption("Falling Ball")
   RIGHT = False 
   LEFT = False 
-  #FALL = False 
-  BAR_ON = None
+  FALL = False 
   run = True 
   bars = makeBars()
   while run:
@@ -130,53 +116,7 @@ def main():
       elif event.type == pg.KEYUP:
         LEFT = False 
         RIGHT = False 
-    #circle = moveCircle(circle, LEFT, RIGHT, bars)
-    #global FALL
-    if LEFT:
-      circle.x -=  CIRCLE_SPEED 
-      LEFT = True 
-    elif RIGHT:
-      circle.x += CIRCLE_SPEED 
-      RIGHT = True 
-    if circle.x <= 0:
-      circle.x = 0
-    elif circle.x + CIRCLE_RADIUS * 2 >= WIN_WIDTH:
-      circle.x = WIN_WIDTH - CIRCLE_RADIUS * 2
-  
-    for j, pair in enumerate(bars):
-      bar, hole = pair 
-      #left_rect = pg.Rect(hole.left, hole.top, OFF, BAR_HEIGHT)
-      #right_rect = pg.Rect(hole.right - OFF, hole.top, OFF, BAR_HEIGHT)
-      rect = pg.Rect(hole.left - OFF, hole.top - OFF, HOLE_WIDTH + OFF * 2, BAR_HEIGHT)
-      if circle.colliderect(rect) and BAR_ON:
-        #FALL = True 
-        if BAR_ON+1 == len(bars):
-          i = 0 
-        else:
-          i = BAR_ON 
-        while not bars[i-1][0].colliderect(circle):
-          circle.y += CIRCLE_SPEED
-          bars = moveBars(bars)
-          drawDisplay(screen, circle, bars)
-          clock.tick(FPS)
-        BAR_ON = i
-          
-      #else:
-      if circle.colliderect(bar):
-            #if (circle.colliderect(hole) or circle.colliderect(left_rect) or circle.colliderect(right_rect)):
-            #if not (bar.top < circle.bottom < bar.bottom or bar.right < circle.bottom < bar.bottom):
-            circle.y = bar.y - CIRCLE_RADIUS * 2
-            #FALL = False 
-            BAR_ON = j
-            
-      #if FALL:
-      #  circle.y += CIRCLE_SPEED
-        
-      if circle.y <= 0:
-        circle.y = WIN_HEIGHT 
-      elif circle.y + CIRCLE_RADIUS * 2 >= WIN_HEIGHT:
-        circle.y = WIN_HEIGHT - CIRCLE_RADIUS * 2
-            
+    circle, FALL = moveCircle(circle, LEFT, RIGHT, bars, FALL)         
     bars = moveBars(bars)
     drawDisplay(screen, circle, bars)
   pg.quit()
