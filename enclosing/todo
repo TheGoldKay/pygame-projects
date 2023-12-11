@@ -7,3 +7,7 @@ click the left button to fire
 possible special ability: pess right mouse button to create a circle around the player (breathing time / kill enemies)
 
 Goal: Make a copy of this game -> https://torcado.itch.io/windowkill 
+
+1 - Learn how to use pygame GUI libraries/packages
+1.1 -> https://github.com/MyreMylar/pygame_gui
+1.2 -> https://github.com/ppizarror/pygame-menu 
