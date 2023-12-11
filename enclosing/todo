@@ -8,6 +8,7 @@ possible special ability: pess right mouse button to create a circle around the 
 
 Goal: Make a copy of this game -> https://torcado.itch.io/windowkill 
 
-1 - Learn how to use pygame GUI libraries/packages
-1.1 -> https://github.com/MyreMylar/pygame_gui
-1.2 -> https://github.com/ppizarror/pygame-menu 
+1 - Learn how to mess around with python ctypes -> https://realpython.com/python-ctypes/
+1.1 - Manipulating the game's window directly through `ctypes.windll` (windows exclusive)
+
+* The script allows the screen's enclosing -> Create an entity/agent to resize the screen as it moves.
