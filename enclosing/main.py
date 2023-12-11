@@ -44,14 +44,18 @@ def protoType2():
     user32 = ctypes.windll.user32
     gdi32 = ctypes.windll.gdi32
 
-    # Define the desired window region as a list of points
-    # (Replace these with the specific coordinates of your desired shape)
-    points = [
-        (100, 100),
-        (200, 50),
-        (300, 150),
-        (250, 250),
-    ]
+    # Define the window center and radius
+    center_x = 400
+    center_y = 300
+    radius = 200
+
+    # Calculate points on the circumference
+    points = []
+    for angle in range(0, 360):
+        x = int(center_x + radius * math.cos(math.radians(angle)))
+        y = int(center_y + radius * math.sin(math.radians(angle)))
+        points.append((x, y))
+
 
     # Convert points to Windows POINT structure
     points_array = (ctypes.wintypes.POINT * len(points))(*points)
