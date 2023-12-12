@@ -34,12 +34,10 @@ def setWindowPos(full_sceen=False):
         pos_x = monitor_width // 2 - WIN_WIDTH // 2
         pos_y = monitor_height // 2 - WIN_HEIGHT // 2
         os.environ['SDL_VIDEO_WINDOW_POS'] = '%i,%i' % (pos_x, pos_y)
-        return pos_x, pos_y, WIN_WIDTH, WIN_HEIGHT
+        return WIN_WIDTH, WIN_HEIGHT
     else:
-        pos_x = 0
-        pos_y = 0
-        os.environ['SDL_VIDEO_WINDOW_POS'] = '%i,%i' % (pos_x, pos_y)
-        return pos_x, pos_y, monitor_width, monitor_height
+        os.environ['SDL_VIDEO_WINDOW_POS'] = '%i,%i' % (0, 0)
+        return monitor_width, monitor_height
 
 def setWindowTransparent():
     hwnd = pygame.display.get_wm_info()["window"] # Getting information of the current active window
@@ -49,14 +47,20 @@ def setWindowTransparent():
     win32gui.SetLayeredWindowAttributes(hwnd, win32api.RGB(*TRANSPARENT), 0, win32con.LWA_COLORKEY)
     return hwnd # the game's window ID
 
+def makeRect(x, y, width, height):
+    rect = pygame.Rect(x, y, width, height)
+    return rect
     
 def main(timer=time.time(), wait=SPEED, radius=RADIUS):
-    center_x, center_y, screen_width, screen_height = setWindowPos(True)
+    screen_width, screen_height = setWindowPos(True)
     window_screen = pygame.display.set_mode((screen_width, screen_height), FLAGS)
     pygame.display.set_caption("Enclosing")
     clock = pygame.time.Clock()
     hwnd = setWindowTransparent()
     limit = 100 # the smallest the circular screen's radius is allowed to get
+    rect_width = 500
+    rect_height = 250
+    rect = makeRect(screen_width // 2 - rect_width // 2, screen_height // 2 - rect_height // 2, rect_width, rect_height)
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -65,17 +69,15 @@ def main(timer=time.time(), wait=SPEED, radius=RADIUS):
                 if event.key == pygame.K_ESCAPE:
                     stop()
         if time.time() - timer > wait:
-            #new_width, new_height = screen_width - STEP, screen_height - STEP
-            screen_width -= STEP 
-            screen_height -= STEP
-            #changeWinSize(center_x, center_y, screen_width, screen_height, hwnd)
-            #screen_width, screen_height = new_width, new_height
-            radius -= STEP
+            center = rect.center 
+            rect.width = rect.width - 2
+            rect.height = rect.height - 1
+            rect.center = center
             timer = time.time()
         if (radius < limit):
             stop()   
         window_screen.fill(TRANSPARENT)
-        pygame.draw.circle(window_screen, PHTHALO_GREEN, window_screen.get_rect().center, radius)
+        pygame.draw.rect(window_screen, PHTHALO_GREEN, rect)
         pygame.display.flip()
         clock.tick(FPS)
 
