@@ -6,6 +6,7 @@ from ctypes.wintypes import BOOL, HWND, RECT
 
 WIN_WIDTH = 500
 WIN_HEIGHT = 500
+PHTHALO_GREEN = (18, 53, 36)
 FLAGS = pygame.NOFRAME
 
 def changeWinSize(x, y, new_width, new_height, hwnd):
@@ -19,6 +20,9 @@ def changeWinSize(x, y, new_width, new_height, hwnd):
         new_height,
         0  # Flags
     )
+def stop():
+    pygame.quit()
+    sys.exit()
 
 def protoType():
     # get our window ID:
@@ -36,67 +40,6 @@ def protoType():
 
     # bottom, top, left, right:  644 98 124 644
 
-def protoType2():
-    import ctypes
-    import pygame
-
-    # Load the necessary Windows DLLs
-    user32 = ctypes.windll.user32
-    gdi32 = ctypes.windll.gdi32
-
-    # Define the window center and radius
-    center_x = 400
-    center_y = 300
-    radius = 200
-
-    # Calculate points on the circumference
-    points = []
-    for angle in range(0, 360):
-        x = int(center_x + radius * math.cos(math.radians(angle)))
-        y = int(center_y + radius * math.sin(math.radians(angle)))
-        points.append((x, y))
-
-
-    # Convert points to Windows POINT structure
-    points_array = (ctypes.wintypes.POINT * len(points))(*points)
-
-    # Create a region object
-    region_handle = gdi32.CreatePolygonRgn(points_array, len(points), 0)
-    
-    # Initialize Pygame and create the screen
-    pygame.init()
-    screen = pygame.display.set_mode((800, 600), pygame.NOFRAME)
-    pygame.display.set_caption("Custom Window Shape")
-
-    # Define the window handle
-    window_handle = pygame.display.get_wm_info()['window']
-
-    # Set window region using the HRGN handle
-    user32.SetWindowRgn(window_handle, region_handle, True)
-
-    # Set window transparency and frameless style
-    screen.set_alpha(None)
-    #window = pygame.display.get_wm_info()
-    #window.set_frame(False)
-    #window.update()
-
-    # Main loop
-    running = True
-    while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-
-        # Fill the screen with any desired color
-        screen.fill((255, 255, 255))
-
-        # Update the display
-        pygame.display.flip()
-
-    # Clean up
-    gdi32.DeleteObject(region_handle)
-    pygame.quit()
-
 
 def main(screen_width=WIN_WIDTH, screen_height=WIN_HEIGHT, flags=FLAGS, timer=time.time(), wait=0.00000005):
     monitors = get_monitors() # Get the resolution of all of the users monitors
@@ -113,17 +56,17 @@ def main(screen_width=WIN_WIDTH, screen_height=WIN_HEIGHT, flags=FLAGS, timer=ti
     
     screen = pygame.display.set_mode((screen_width, screen_height), flags)
     pygame.display.set_caption("Enclosing")
-    done = False
     clock = pygame.time.Clock()
     
     hwnd = pygame.display.get_wm_info()
+    limit = 50 # the smallest the window's height and wight are allowed to get
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                done = True
+                stop()
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    done = True
+                    stop()
         if time.time() - timer > wait:
             new_width, new_height = math.floor(screen_width * 0.99999999999999), math.floor(screen_height * 0.99999999999999)
             new_pos_x = (pos_x + screen_width // 2) - new_width // 2
@@ -133,12 +76,11 @@ def main(screen_width=WIN_WIDTH, screen_height=WIN_HEIGHT, flags=FLAGS, timer=ti
             pos_x = new_pos_x
             pos_y = new_pos_y
             timer = time.time()
-        if done:
-            pygame.quit()
-            sys.exit()
-        screen.fill((18, 53, 36))
+            if (screen_width < limit or screen_height < limit):
+                stop()   
+        screen.fill(PHTHALO_GREEN)
         pygame.display.flip()
         clock.tick(60)
 
 if __name__ == "__main__":
-    protoType2()
+    main()
