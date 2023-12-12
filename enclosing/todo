@@ -12,3 +12,6 @@ Goal: Make a copy of this game -> https://torcado.itch.io/windowkill
 1.1 - Manipulating the game's window directly through `ctypes.windll` (windows exclusive)
 
 * The script allows the screen's enclosing -> Create an entity/agent to resize the screen as it moves.
+
+-> Make window transparent and without borders (no frame) 
+-> Draw a circle (big enough to touch all borders) in the center of the screen
