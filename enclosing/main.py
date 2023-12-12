@@ -11,39 +11,35 @@ WIN_WIDTH = 500
 WIN_HEIGHT = 500
 PHTHALO_GREEN = (18, 53, 36)
 TRANSPARENT = (0, 0, 0) # to create the effect of transparency any color can be used except PHTHALO_GREEN
+PLAYER_COLOR = (255, 255, 255)
+PLAYER_RADIUS = 10
 STEP = 1
 SPEED = 0.04 # time in seconds to wait before the window is resized
 FLAGS = pygame.NOFRAME
 RADIUS = WIN_WIDTH // 2
 FPS = 60
 
-def changeWinSize(x, y, new_width, new_height, hwnd):
-    # Use ctypes to change the window size
-    ctypes.windll.user32.SetWindowPos(
-        hwnd,
-        ctypes.c_int(0),  # HWND_TOP,
-        x - new_width // 2,
-        y - new_height // 2,
-        new_width,
-        new_height,
-        0  # Flags
-    )
 def stop():
     pygame.quit()
     sys.exit()
 
-def centerWindow():
+def setWindowPos(full_sceen=False):
     monitors = get_monitors() # Get the resolution of all of the users monitors
     for monitor in monitors:
         if monitor.is_primary: # main monitor
             monitor_width = monitors[0].width 
             monitor_height = monitors[0].height 
             break
-
-    pos_x = monitor_width // 2 - WIN_WIDTH // 2
-    pos_y = monitor_height // 2 - WIN_HEIGHT // 2
-    os.environ['SDL_VIDEO_WINDOW_POS'] = '%i,%i' % (pos_x, pos_y)
-    return monitor_width // 2, monitor_height // 2
+    if(not full_sceen):
+        pos_x = monitor_width // 2 - WIN_WIDTH // 2
+        pos_y = monitor_height // 2 - WIN_HEIGHT // 2
+        os.environ['SDL_VIDEO_WINDOW_POS'] = '%i,%i' % (pos_x, pos_y)
+        return pos_x, pos_y, WIN_WIDTH, WIN_HEIGHT
+    else:
+        pos_x = 0
+        pos_y = 0
+        os.environ['SDL_VIDEO_WINDOW_POS'] = '%i,%i' % (pos_x, pos_y)
+        return pos_x, pos_y, monitor_width, monitor_height
 
 def setWindowTransparent():
     hwnd = pygame.display.get_wm_info()["window"] # Getting information of the current active window
@@ -53,9 +49,10 @@ def setWindowTransparent():
     win32gui.SetLayeredWindowAttributes(hwnd, win32api.RGB(*TRANSPARENT), 0, win32con.LWA_COLORKEY)
     return hwnd # the game's window ID
 
-def main(screen_width=WIN_WIDTH, screen_height=WIN_HEIGHT, flags=FLAGS, timer=time.time(), wait=SPEED, radius=RADIUS):
-    center_x, center_y = centerWindow()
-    window_screen = pygame.display.set_mode((screen_width, screen_height), flags)
+    
+def main(timer=time.time(), wait=SPEED, radius=RADIUS):
+    center_x, center_y, screen_width, screen_height = setWindowPos(True)
+    window_screen = pygame.display.set_mode((screen_width, screen_height), FLAGS)
     pygame.display.set_caption("Enclosing")
     clock = pygame.time.Clock()
     hwnd = setWindowTransparent()
@@ -68,9 +65,11 @@ def main(screen_width=WIN_WIDTH, screen_height=WIN_HEIGHT, flags=FLAGS, timer=ti
                 if event.key == pygame.K_ESCAPE:
                     stop()
         if time.time() - timer > wait:
-            new_width, new_height = screen_width - STEP, screen_height - STEP
-            changeWinSize(center_x, center_y, new_width, new_height, hwnd)
-            screen_width, screen_height = new_width, new_height
+            #new_width, new_height = screen_width - STEP, screen_height - STEP
+            screen_width -= STEP 
+            screen_height -= STEP
+            #changeWinSize(center_x, center_y, screen_width, screen_height, hwnd)
+            #screen_width, screen_height = new_width, new_height
             radius -= STEP
             timer = time.time()
         if (radius < limit):

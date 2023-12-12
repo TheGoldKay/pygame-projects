@@ -15,3 +15,7 @@ Goal: Make a copy of this game -> https://torcado.itch.io/windowkill
 
 -> Make window transparent and without borders (no frame) 
 -> Draw a circle (big enough to touch all borders) in the center of the screen
+
+* There is no need to reduce the window through ctypes.windll, you can just make it transparent and without borders.
+* The screen not being perceived by the player is all that matters and setting it to invisible is much better than manipulating it directly with pythong's ctypes 
+* Once invisible, you can create either use a circular or rectangular shape and enclose it instead.
