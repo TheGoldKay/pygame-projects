@@ -19,3 +19,11 @@ Goal: Make a copy of this game -> https://torcado.itch.io/windowkill
 * There is no need to reduce the window through ctypes.windll, you can just make it transparent and without borders.
 * The screen not being perceived by the player is all that matters and setting it to invisible is much better than manipulating it directly with pythong's ctypes 
 * Once invisible, you can create either use a circular or rectangular shape and enclose it instead.
+
+* The main display will be set to fullscreen
+* The display will be filled with rectangles, each of them to be treated as a display
+* To the player they will be seem as seperate entities, but they're just surfaces drawn upon a transparent display (another surface)
+* Must find a way to store these rects (displays) positions in releation to the transparent main display to allow proper 
+iteration among them and also the player character
+* A possible future iteration is one enemy from one display fire and the bullet seemingly teleport from its display to the player's
+display current display (where they are), the player will also be able to do the same (but will be unable to leave their own display)
