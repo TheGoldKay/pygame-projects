@@ -23,21 +23,21 @@ def stop():
     pygame.quit()
     sys.exit()
 
-def setWindowPos(full_sceen=False):
+def setWindowPos(full_sceen=True):
     monitors = get_monitors() # Get the resolution of all of the users monitors
     for monitor in monitors:
         if monitor.is_primary: # main monitor
             monitor_width = monitors[0].width 
             monitor_height = monitors[0].height 
             break
-    if(not full_sceen):
+    if(full_sceen):
+        os.environ['SDL_VIDEO_WINDOW_POS'] = '%i,%i' % (0, 0)
+        return monitor_width, monitor_height
+    else:
         pos_x = monitor_width // 2 - WIN_WIDTH // 2
         pos_y = monitor_height // 2 - WIN_HEIGHT // 2
         os.environ['SDL_VIDEO_WINDOW_POS'] = '%i,%i' % (pos_x, pos_y)
         return WIN_WIDTH, WIN_HEIGHT
-    else:
-        os.environ['SDL_VIDEO_WINDOW_POS'] = '%i,%i' % (0, 0)
-        return monitor_width, monitor_height
 
 def setWindowTransparent():
     hwnd = pygame.display.get_wm_info()["window"] # Getting information of the current active window
@@ -52,12 +52,11 @@ def makeRect(x, y, width, height):
     return rect
     
 def main(timer=time.time(), wait=SPEED, radius=RADIUS):
-    screen_width, screen_height = setWindowPos(True)
+    screen_width, screen_height = setWindowPos()
     window_screen = pygame.display.set_mode((screen_width, screen_height), FLAGS)
     pygame.display.set_caption("Enclosing")
     clock = pygame.time.Clock()
     hwnd = setWindowTransparent()
-    limit = 100 # the smallest the circular screen's radius is allowed to get
     rect_width = 500
     rect_height = 250
     rect = makeRect(screen_width // 2 - rect_width // 2, screen_height // 2 - rect_height // 2, rect_width, rect_height)
@@ -74,7 +73,7 @@ def main(timer=time.time(), wait=SPEED, radius=RADIUS):
             rect.height = rect.height - 1
             rect.center = center
             timer = time.time()
-        if (radius < limit):
+        if (rect.width < 100):
             stop()   
         window_screen.fill(TRANSPARENT)
         pygame.draw.rect(window_screen, PHTHALO_GREEN, rect)
