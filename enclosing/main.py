@@ -10,7 +10,7 @@ import win32gui
 WIN_WIDTH = 500
 WIN_HEIGHT = 500
 PHTHALO_GREEN = (18, 53, 36)
-TRANSPARENT = (0, 0, 0) # to create the effect of transparency any color can be used except PHTHALO_GREEN
+TRANSPARENT = (0, 0, 0) # to create the effect of transparency any color can be used except PHTHALO_GREEN (Player's screen)
 PLAYER_COLOR = (255, 255, 255)
 PLAYER_RADIUS = 10
 STEP = 1
@@ -44,7 +44,7 @@ def setWindowTransparent():
     win32gui.SetWindowLong(hwnd, win32con.GWL_EXSTYLE, win32gui.GetWindowLong(
                         hwnd, win32con.GWL_EXSTYLE) | win32con.WS_EX_LAYERED)
     # This will set the opacity and transparency color key of a layered window
-    win32gui.SetLayeredWindowAttributes(hwnd, win32api.RGB(*TRANSPARENT), 0, win32con.LWA_COLORKEY)
+    win32gui.SetLayeredWindowAttributes(hwnd, win32api.RGB(*TRANSPARENT), 255, win32con.LWA_COLORKEY)
     return hwnd # the game's window ID
 
 def makeRect(x, y, width, height):
@@ -77,6 +77,12 @@ def main(timer=time.time(), wait=SPEED, radius=RADIUS):
             stop()   
         window_screen.fill(TRANSPARENT)
         pygame.draw.rect(window_screen, PHTHALO_GREEN, rect)
+        rectBottom = pygame.Rect(rect.right, rect.bottom, rect.width, rect.height)
+        rectTop = rect.copy()
+        rectTop.bottom = rect.top 
+        rectTop.right = rect.left
+        pygame.draw.rect(window_screen, PHTHALO_GREEN, rectBottom)
+        pygame.draw.rect(window_screen, PHTHALO_GREEN, rectTop)
         pygame.display.flip()
         clock.tick(FPS)
 
