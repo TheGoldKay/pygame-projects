@@ -10,7 +10,8 @@ import win32gui
 WIN_WIDTH = 500
 WIN_HEIGHT = 500
 PHTHALO_GREEN = (18, 53, 36)
-TRANSPARENT = (0, 0, 0) # to create the effect of transparency any color can be used except PHTHALO_GREEN (Player's screen)
+GREEN = (0, 255, 0)
+TRANSPARENT = (0, 0, 0) # to create the effect of transparency any color can be used except this color (Player's screen)
 PLAYER_COLOR = (255, 255, 255)
 PLAYER_RADIUS = 10
 STEP = 1
@@ -52,8 +53,8 @@ def makeRect(x, y, width, height):
     return rect
     
 def main(timer=time.time(), wait=SPEED, radius=RADIUS):
-    screen_width, screen_height = setWindowPos()
-    window_screen = pygame.display.set_mode((screen_width, screen_height), FLAGS)
+    screen_width, screen_height = setWindowPos(True)
+    window_screen = pygame.display.set_mode((screen_width, screen_height))
     pygame.display.set_caption("Enclosing")
     clock = pygame.time.Clock()
     hwnd = setWindowTransparent()
@@ -77,14 +78,9 @@ def main(timer=time.time(), wait=SPEED, radius=RADIUS):
             stop()   
         window_screen.fill(TRANSPARENT)
         pygame.draw.rect(window_screen, PHTHALO_GREEN, rect)
-        rectBottom = pygame.Rect(rect.right, rect.bottom, rect.width, rect.height)
-        rectTop = rect.copy()
-        rectTop.bottom = rect.top 
-        rectTop.right = rect.left
-        pygame.draw.rect(window_screen, PHTHALO_GREEN, rectBottom)
-        pygame.draw.rect(window_screen, PHTHALO_GREEN, rectTop)
         pygame.display.flip()
         clock.tick(FPS)
 
+main()
 if __name__ == "__main__":
     main()
