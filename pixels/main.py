@@ -16,13 +16,14 @@ def randPos(width, height):
 def randColor():
     return (randint(0, 255), randint(0, 255), randint(0, 255))
 
-def paint(pxarr, x, y, color):
-    var = randint(1, 10)
+def paint(pxarr, x, y, color, var = 0, mouse = False):
+    var = var or randint(1, 10)
     for i in range(x - var//2, x + var//2):
         for j in range(y - var//2, y + var//2):
-            if (i, j) in POS:
-                return
-            POS.add((i, j))
+            if not mouse:
+                if (i, j) in POS:
+                    return
+                POS.add((i, j))
             if i < 0 or j < 0:
                 continue 
             if i >= WIDTH or j >= HEIGHT:
@@ -46,6 +47,8 @@ def main():
         color = randColor()
         paint(pxarr, x, y, color)
         pxarr[x, y] = (0, 0, 0) # square's center
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        paint(pxarr, mouse_x, mouse_y, (255, 255, 255), 25, mouse = True)
         pygame.display.update()
         clock.tick(FPS)
 
