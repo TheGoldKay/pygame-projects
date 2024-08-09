@@ -18,8 +18,8 @@ def randColor():
 
 def paint(pxarr, x, y, color):
     var = randint(1, 10)
-    for i in range(x, x+var):
-        for j in range(y, y+var):
+    for i in range(x - var//2, x + var//2):
+        for j in range(y - var//2, y + var//2):
             if (i, j) in POS:
                 return
             POS.add((i, j))
@@ -45,7 +45,7 @@ def main():
         x, y = randPos(WIDTH, HEIGHT)
         color = randColor()
         paint(pxarr, x, y, color)
-        pxarr[x, y] = randColor()
+        pxarr[x, y] = (0, 0, 0) # square's center
         pygame.display.update()
         clock.tick(FPS)
 
