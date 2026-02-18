@@ -1,2 +1,2 @@
 # pygame-projects
-simple 2d games made with pygame
+Simple 2d games made with [Pygame-ce](https://github.com/pygame-community)
